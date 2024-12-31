@@ -1,6 +1,6 @@
 plugins {
     id 'org.openjfx.javafxplugin' version '0.0.14'
-    id 'org.beryx.jlink' version '3.0.0'
+    id 'org.beryx.jlink' version '3.1.1'
     id 'antlr'
     id 'idea'
     id 'application'
@@ -52,7 +52,7 @@ jlink {
     jpackage {
         def os = org.gradle.internal.os.OperatingSystem.current()
         installerOptions = [
-                '--resource-dir', 'src/main/resources',
+                '--resource-dir', 'app/src/main/resources',
                 '--name', 'PrettyZoo',
                 '--app-version', "${project.version}",
                 '--description', 'Pretty nice Zookeeper GUI',
@@ -60,7 +60,7 @@ jlink {
                 '--vendor', 'vran'
         ]
         if (os.windows) {
-            icon = 'src/main/resources/assets/icon/icon.ico'
+            icon = 'app/src/main/resources/assets/icon/icon.ico'
             installerOptions += [
                     '--win-per-user-install', '--win-dir-chooser',
                     '--win-shortcut'
@@ -69,11 +69,11 @@ jlink {
 
         if (os.macOsX) {
             installerType = 'dmg'
-            icon = 'src/main/resources/assets/icon/Icon.icns'
+            icon = 'app/src/main/resources/assets/icon/Icon.icns'
         }
 
         if (os.linux) {
-            icon = 'src/main/resources/assets/icon/icon.png'
+            icon = 'app/src/main/resources/assets/icon/icon.png'
             installerOptions += [
                     '--linux-deb-maintainer', 'vran_dev@foxmail.com',
                     '--linux-rpm-license-type', 'GPLv3',
@@ -85,36 +85,36 @@ jlink {
 
 jpackage {
     doLast {
-        file("${buildDir}/jpackage/prettyZoo-${version}.dmg").renameTo("${buildDir}/jpackage/prettyZoo-mac.dmg")
-        file("${buildDir}/jpackage/prettyZoo-${version}.msi").renameTo("${buildDir}/jpackage/prettyZoo-win.msi")
-        file("${buildDir}/jpackage/prettyZoo-${version}.rpm").renameTo("${buildDir}/jpackage/prettyZoo-linux.rpm")
-        file("${buildDir}/jpackage/prettyZoo-${version}.deb").renameTo("${buildDir}/jpackage/prettyZoo-linux.deb")
+        file("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-${version}.dmg").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-mac.dmg")
+        file("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-${version}.msi").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-win.msi")
+        file("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-${version}.rpm").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-linux.rpm")
+        file("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-${version}.deb").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-linux.deb")
     }
 }
 
 task releaseWinZip(type: Zip, dependsOn: jpackage) {
     def os = org.gradle.internal.os.OperatingSystem.current()
     if (os.windows) {
-        from "${buildDir}/jpackage/prettyZoo"
+        from "${getLayout().getBuildDirectory()}/jpackage/prettyZoo"
         archiveFileName = "prettyZoo-win.zip"
-        destinationDirectory = file("$buildDir/jpackage")
+        destinationDirectory = file("$getLayout().getBuildDirectory()/jpackage")
     }
 }
 
 task releaseJarZip(dependsOn: distZip) {
     def os = org.gradle.internal.os.OperatingSystem.current()
     if (os.windows) {
-        file("${buildDir}/distributions/app-${version}.zip").renameTo("${buildDir}/jpackage/prettyZoo-win-java17.zip")
+        file("${getLayout().getBuildDirectory()}/distributions/app-${version}.zip").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-win-java17.zip")
         println "windows jar zip release ok"
         return
     }
     if (os.linux) {
-        file("${buildDir}/distributions/app-${version}.zip").renameTo("${buildDir}/jpackage/prettyZoo-linux-java17.zip")
+        file("${getLayout().getBuildDirectory()}/distributions/app-${version}.zip").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-linux-java17.zip")
         println "linux jar zip release ok"
         return
     }
     if (os.macOsX) {
-        file("${buildDir}/distributions/app-${version}.zip").renameTo("${buildDir}/jpackage/prettyZoo-mac-java17.zip")
+        file("${getLayout().getBuildDirectory()}/distributions/app-${version}.zip").renameTo("${getLayout().getBuildDirectory()}/jpackage/prettyZoo-mac-java17.zip")
         println "macOsX jar zip release ok"
         return
     }
